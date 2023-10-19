@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  app:
+    image: 888_api:latest
+    container_name: 888_api
+    build:
+      context: .
+      args:
+        - DEV=true
+    ports:
+      - "5000:5000"
+#    by using volumes we sync our local code with our container, so we don't need to rebuild every time our container
+    volumes:
+      - ./app:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASS=changeme
+    depends_on:
+      - db
+    command: ["flask", "run", "--host", "0.0.0.0"]
+
+
+  db:
+    image: postgres:13-alpine
+    container_name: db-postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+      - ./instance/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=devdb
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=changeme
+
+volumes:
+  dev-db-data:
