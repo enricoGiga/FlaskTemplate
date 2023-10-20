@@ -3,3 +3,5 @@ psycopg2
 flask-smorest==0.42.1
 python-dotenv
 marshmallow
+apscheduler
+gunicorn

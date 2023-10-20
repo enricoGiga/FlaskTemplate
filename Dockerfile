@@ -9,6 +9,7 @@ EXPOSE 5000
 ARG DEV=false
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
+    apk add --no-cache tzdata && \
     apk add --update --no-cache postgresql-client && \
     apk add --update --no-cache --virtual .tmp-build-deps \
         build-base postgresql-dev musl-dev && \
@@ -19,7 +20,10 @@ RUN python -m venv /py && \
     rm -rf /tmp && \
     apk del .tmp-build-deps
 
+RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+RUN cp /etc/localtime /etc/localtime
 # the path is the env variab that's automatically created on Linux OS
 # so whenever we luch a python command it will run automatically from our python environment
 ENV PATH="/py/bin:$PATH"
-CMD ["flask", "run", "--host", "0.0.0.0"]
+ENV TZ=Europe/Dublin
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]

@@ -9,7 +9,7 @@ CREATE TYPE event_status AS ENUM ('Pending', 'Started', 'Ended', 'Cancelled');
 
 CREATE TABLE IF NOT EXISTS event (
     name VARCHAR(255) PRIMARY KEY,
-    slug VARCHAR(255) UNIQUE NOT NULL,
+    slug VARCHAR(255) NOT NULL,
     active BOOLEAN NOT NULL,
     type event_type NOT NULL,
     sport VARCHAR(255) REFERENCES sport(name),

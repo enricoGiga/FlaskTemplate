@@ -1,22 +1,23 @@
 from flask import jsonify
 from flask.views import MethodView
-from flask_smorest import abort, Blueprint
+from flask_smorest import Blueprint, abort
 from psycopg2.extras import RealDictCursor
 
 from database import get_db
-from schemas import SportSchema
+from exceptions import create_exceptions
+from schemas import SportSchema, SportUpdateSchema
 
 sportBlueprint = Blueprint("Sports", "sports", description="Operations on sports")
 
 
-@sportBlueprint.route("/sport/<string:name>")
+@sportBlueprint.route("/sport/<string:sport_id>")
 class Sport(MethodView):
     @sportBlueprint.response(200, SportSchema)
-    def get(self, name):
+    def get(self, sport_id):
 
         db = get_db()
         cursor = db.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM sport WHERE name = %s', (name,))
+        cursor.execute('SELECT * FROM sport WHERE name = %s', (sport_id,))
         sport = cursor.fetchone()
         if sport is None:
             return jsonify({"error": "Sport not found"}), 404
@@ -25,33 +26,58 @@ class Sport(MethodView):
 
         return sport
 
-    def delete(self, name):
+    def delete(self, sport_id):
+        with get_db() as db:
+            cursor = db.cursor()
+            cursor.execute('SELECT * FROM sport WHERE name = %s', (sport_id,))
+            sport = cursor.fetchone()
 
-        return {"message": "Item deleted."}
+            if not sport:
+                db.commit()
+                cursor.close()
+                abort(404, message='Sport not found.')
 
-    @sportBlueprint.arguments(SportSchema)
+            delete_query = 'DELETE FROM sport WHERE name = %s'
+            cursor.execute(delete_query, (sport_id,))
+
+            db.commit()
+            cursor.close()
+        return {"message": "Sport deleted."}
+
+    @sportBlueprint.arguments(SportUpdateSchema)
     @sportBlueprint.response(200, SportSchema)
-    def put(self, item_data, item_id):
+    def put(self, sport_data, sport_id):
+        db = get_db()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('SELECT * FROM sport WHERE name = %s', (sport_id,))
+        sport = cursor.fetchone()
+        if not sport:
+            db.commit()
+            cursor.close()
+            abort(404, message='Sport not found.')
+        slug = sport_data.get('slug')
+        active = sport_data.get('active')
 
-        item = ""
-        if item:
-            item.price = item_data["price"]
-            item.name = item_data["name"]
-        else:
-            item = ""
-            # item = ItemModel(id=item_id, **item_data)
+        if slug is not None and active is not None:
+            update_query = 'UPDATE sport SET slug = %s, active = %s WHERE name = %s RETURNING *'
+            cursor.execute(update_query, (slug, active, sport_id))
+        elif slug is not None:
+            update_query = 'UPDATE sport SET slug = %s WHERE name = %s RETURNING *'
+            cursor.execute(update_query, (slug, sport_id))
+        elif active is not None:
+            update_query = 'UPDATE sport SET active = %s WHERE name = %s RETURNING *'
+            cursor.execute(update_query, (active, sport_id))
+        updated_sport = cursor.fetchone()
+        db.commit()
+        cursor.close()
 
-        # db.session.add(item)
-        # db.session.commit()
-
-        return item
+        return updated_sport
 
 
 @sportBlueprint.route("/sport")
 class SportList(MethodView):
     @sportBlueprint.response(200, SportSchema(many=True))
     def get(self):
-
         db = get_db()
         cursor = db.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT name, slug, active FROM sport')
@@ -61,25 +87,19 @@ class SportList(MethodView):
 
         return sports
 
+    @create_exceptions
     @sportBlueprint.arguments(SportSchema)
     @sportBlueprint.response(201, SportSchema)
     def post(self, sport_data):
-        item = {}
+        db = get_db()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(
+            "INSERT INTO sport (name, slug, active) VALUES (%s, %s, %s) RETURNING name, slug, active;",
+            (sport_data["name"], sport_data["slug"], sport_data["active"]),
+        )
 
-        try:
-
-            db = get_db()
-            cursor = db.cursor()
-            cursor.execute(
-                "INSERT INTO sport (name, slug, active) VALUES (%s, %s, %s) RETURNING name, slug, active;",
-                (sport_data["name"], sport_data["slug"], str(sport_data["active"])),
-            )
-
-            # Fetch the inserted item
-            item = cursor.fetchone()
-            db.commit()
-            cursor.close()
-        except Exception:
-            abort(500, message="An error occurred while inserting the item.")
+        item = cursor.fetchone()
+        db.commit()
+        cursor.close()
 
         return item
