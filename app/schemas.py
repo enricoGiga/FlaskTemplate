@@ -19,8 +19,8 @@ class EventSchema(Schema):
     type = fields.Str(required=True)
     sport = fields.Str(required=True)
     status = fields.Str(required=True)
-    scheduled_start = fields.DateTime(required=True)
-    actual_start = fields.DateTime()
+    scheduled_start = fields.DateTime(required=True, format='%Y-%m-%d %H:%M:%S')
+    actual_start = fields.DateTime(format='%Y-%m-%d %H:%M:%S')
 
 
 class SelectionSchema(Schema):

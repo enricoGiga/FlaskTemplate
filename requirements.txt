@@ -5,3 +5,4 @@ python-dotenv
 marshmallow
 apscheduler
 gunicorn
+Flask-Caching

@@ -3,21 +3,18 @@ from datetime import timezone
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, g
+from flask_caching import Cache
 from flask_smorest import Api
 from psycopg2.extras import RealDictCursor
 
-from database import get_db
-from resources.event import eventBlueprint
-from resources.search import searchBlueprint
-from resources.selection import selectionBlueprint
-from resources.sport import sportBlueprint
+from utility.database import SQLHelper
 
 # Initialize the scheduler
 scheduler = BackgroundScheduler()
 
 
 def get_events():
-    db = get_db()
+    db = SQLHelper.get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
     current_time = datetime.now()
     # Convert the local time to UTC
@@ -35,7 +32,7 @@ def get_events():
 
 
 def update_event_status(event_id):
-    db = get_db()
+    db = SQLHelper.get_db()
     cursor = db.cursor()
 
     current_time = datetime.now()
@@ -64,20 +61,33 @@ def create_app():
     app.config["OPENAPI_VERSION"] = "3.0.3"
     app.config["OPENAPI_URL_PREFIX"] = "/"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
+
     app.config[
         "OPENAPI_SWAGGER_UI_URL"
     ] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
     app.config["PROPAGATE_EXCEPTIONS"] = True
+    app.config["CACHE_TYPE"] = "SimpleCache"
+    app.config["CACHE_DEFAULT_TIMEOUT"] = 300
+    # Adding Flask-Caching configurations
+    cache = Cache(app)
+    cache.init_app(app)
+    app.config["CACHE"] = cache  # Store the cache object in the app context
 
+    # Create a function to close the database connection and return it to the pool
     @app.teardown_appcontext
-    def close_db_connection(exception=None):
-        db = g.pop('db', None)
-        if db is not None:
-            db.close()
+    def close_db(error):
+        if 'db' in g:
+            g.db.commit()
+            # Make sure any pending transactions are committed
+            SQLHelper.get_connection_pool().putconn(g.db)
+            g.pop('db', None)
 
     api = Api(app)
-
+    from resources.event import eventBlueprint
+    from resources.search import searchBlueprint
+    from resources.selection import selectionBlueprint
+    from resources.sport import sportBlueprint
     api.register_blueprint(sportBlueprint)
     api.register_blueprint(eventBlueprint)
     api.register_blueprint(selectionBlueprint)
@@ -86,11 +96,11 @@ def create_app():
     return app
 
 
-app = create_app()
+
 
 if __name__ == "__main__":
-    with app.app_context():
-        # Schedule the job to run periodically, for example every minute
-        scheduler.add_job(check_event_statuses, 'interval', seconds=15)
-        scheduler.start()
+    app = create_app()
+    # Schedule the job to run periodically, for example every minute
+    scheduler.add_job(check_event_statuses, 'interval', seconds=15)
+    scheduler.start()
     app.run(host="0.0.0.0", port=5000)

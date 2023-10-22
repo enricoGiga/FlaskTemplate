@@ -1,12 +1,11 @@
 from flask import jsonify, request
 from flask.views import MethodView
-from flask_smorest import Blueprint, abort
+from flask_smorest import Blueprint
 from marshmallow import ValidationError
-from psycopg2.extras import RealDictCursor
 
-from database import get_db
-from exceptions import create_exceptions
 from schemas import SelectionSchema, SelectionUpdateSchema
+from utility.database import SQLHelper
+from utility.exceptions import create_exceptions
 
 selectionBlueprint = Blueprint("Selections", "selections", description="Operations on selections")
 
@@ -24,40 +23,36 @@ def handle_validation_error(error):
 
 @selectionBlueprint.route("/selection")
 class SelectionList(MethodView):
+    @SQLHelper.handle_database_connection
     @create_exceptions
     @selectionBlueprint.arguments(SelectionSchema)
     @selectionBlueprint.response(201, SelectionSchema)
-    def post(self, selection_data):
-        with get_db() as db:
-            cursor = db.cursor(cursor_factory=RealDictCursor)
-            cursor.execute(
-                "INSERT INTO selection (name, event, price, active, outcome) "
-                "VALUES (%s, %s, %s, %s, %s) "
-                "RETURNING name, event, price, active, outcome;",
-                (selection_data["name"], selection_data["event"], selection_data["price"], selection_data["active"],
-                 selection_data["outcome"]),
-            )
+    def post(self, cursor, selection_data):
 
-            selection = cursor.fetchone()
-            db.commit()
-            cursor.close()
+        cursor.execute(
+            "INSERT INTO selection (name, event, price, active, outcome) "
+            "VALUES (%s, %s, %s, %s, %s) "
+            "RETURNING name, event, price, active, outcome;",
+            (selection_data["name"], selection_data["event"], selection_data["price"], selection_data["active"],
+             selection_data["outcome"]),
+        )
+        selection = cursor.fetchone()
 
-        return selection
+        return jsonify(selection)
 
+    @SQLHelper.handle_database_connection
     @selectionBlueprint.arguments(SelectionUpdateSchema)
-    def put(self, sport_data):
-        db = get_db()
+    def put(self, cursor, sport_data):
+
         name = request.args.get('name')
         event = request.args.get('event')
-        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute('SELECT * FROM selection WHERE name = %s AND event = %s', (name, event))
         selection = cursor.fetchone()
 
         if not selection:
-            db.commit()
-            cursor.close()
-            abort(404, message='Selection not found.')
+            return jsonify({"error": "Selection not found."}), 404
+
         price = sport_data.get('price')
         active = sport_data.get('active')
         outcome = sport_data.get('outcome')
@@ -69,7 +64,6 @@ class SelectionList(MethodView):
         if active is not None:
             update_query = 'UPDATE selection SET active = %s WHERE name = %s AND event = %s'
             cursor.execute(update_query, (active, name, event))
-
             if not active:
                 cursor.execute(
                     """
@@ -82,8 +76,10 @@ class SelectionList(MethodView):
                     """, (event,))
                 counter_results = cursor.fetchone()
                 if counter_results["inactive_count"] == counter_results["total_count"]:
-                    update_query = 'UPDATE event SET active = %s WHERE name = %s '
+                    update_query = 'UPDATE event SET active = %s WHERE name = %s'
                     cursor.execute(update_query, (False, event))
+
+
 
         if outcome is not None:
             update_query = 'UPDATE selection SET outcome = %s WHERE name = %s AND event = %s '
@@ -91,7 +87,5 @@ class SelectionList(MethodView):
 
         cursor.execute('SELECT * FROM selection WHERE name = %s AND event = %s', (name, event))
         selection_updated = cursor.fetchone()
-        db.commit()
-        cursor.close()
 
-        return selection_updated
+        return jsonify(selection_updated)

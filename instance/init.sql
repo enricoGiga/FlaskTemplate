@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS event (
     type event_type NOT NULL,
     sport VARCHAR(255) REFERENCES sport(name),
     status event_status NOT NULL,
-    scheduled_start TIMESTAMP WITH TIME ZONE NOT NULL,
-    actual_start TIMESTAMP WITH TIME ZONE
+    scheduled_start TIMESTAMP,
+    actual_start TIMESTAMP
 );
 CREATE TYPE outcome_type AS ENUM ('Unsettled', 'Void', 'Lose', 'Win');
 CREATE TABLE IF NOT EXISTS selection (
@@ -34,9 +34,9 @@ INSERT INTO sport (name, slug, active) VALUES ('Basketball', 'basketball', true)
 
 -- Inserting data into the event table
 INSERT INTO event (name, slug, active, type, sport, status, scheduled_start)
-VALUES ('Football Match 1', 'juventus Bohemians', true, 'preplay', 'Football', 'Pending', '2023-10-20 15:00:00+00');
+VALUES ('Football Match 1', 'juventus Bohemians', true, 'preplay', 'Football', 'Pending', '2023-10-20 15:00:00');
 INSERT INTO event (name, slug, active, type, sport, status, scheduled_start)
-VALUES ('Basketball Match 1', 'Miami Brookling', true, 'preplay', 'Basketball', 'Pending', '2023-10-21 18:00:00+00');
+VALUES ('Basketball Match 1', 'Miami Brookling', true, 'preplay', 'Basketball', 'Pending', '2023-10-21 18:00:00');
 
 -- Inserting data into the selection table
 INSERT INTO selection (name, event, price, active, outcome) VALUES ('X', 'Football Match 1', 1.5, true, 'Unsettled');
