@@ -25,7 +25,9 @@ It includes a basic Flask application with a Swagger UI endpoint.
 1. Clone the repository.
 2. Navigate to the project directory.
 3. Build the Docker image.
-4. Run the Docker container.
+4. Run the Dockers container: 
+   ```bash
+   docker-compose up
 5. Once the Docker container is up and running, you can access the Swagger UI by visiting the following URL in your web browser: http://localhost:5000/swagger-ui
 
 ## Troubleshooting
