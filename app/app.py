@@ -12,10 +12,8 @@ from utility.database import SQLHelper
 # Initialize the scheduler
 scheduler = BackgroundScheduler()
 
-
-def get_events():
-    db = SQLHelper.get_db()
-    cursor = db.cursor(cursor_factory=RealDictCursor)
+@SQLHelper.handle_database_connection
+def get_events(cursor):
     current_time = datetime.now()
     # Convert the local time to UTC
     utc_time = current_time.astimezone(timezone.utc)
@@ -25,15 +23,11 @@ def get_events():
     """
     cursor.execute(query, (utc_time,))
     events = cursor.fetchall()
-    db.commit()
-    cursor.close()
 
     return events
 
-
-def update_event_status(event_id):
-    db = SQLHelper.get_db()
-    cursor = db.cursor()
+@SQLHelper.handle_database_connection
+def update_event_status(event_id, cursor):
 
     current_time = datetime.now()
     # Convert the local time to UTC
@@ -43,15 +37,15 @@ def update_event_status(event_id):
         UPDATE event SET status = %s, actual_start = %s WHERE name = %s
     """
     cursor.execute(update_query, ("Started", utc_time, event_id))
-    db.commit()
-    cursor.close()
 
 
 def check_event_statuses():
     with app.app_context():
+
         events = get_events()  # Implement a function to fetch all events from the database
         for event in events:
-            update_event_status(event['name'])
+            update_event_status( event['name'])
+
 
 
 def create_app():
@@ -94,8 +88,6 @@ def create_app():
     api.register_blueprint(searchBlueprint)
 
     return app
-
-
 
 
 if __name__ == "__main__":

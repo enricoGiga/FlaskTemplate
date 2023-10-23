@@ -70,30 +70,24 @@ class Sport(MethodView):
 
 @sportBlueprint.route("/sport")
 class SportList(MethodView):
+    @SQLHelper.handle_database_connection
     @sportBlueprint.response(200, SportSchema(many=True))
-    def get(self):
-        db = get_db()
-        cursor = db.cursor(cursor_factory=RealDictCursor)
+    def get(self, cursor):
         cursor.execute('SELECT name, slug, active FROM sport')
         sports = cursor.fetchall()
-        db.commit()
-        cursor.close()
 
         return jsonify(sports)
 
     @create_exceptions
     @sportBlueprint.arguments(SportSchema)
     @sportBlueprint.response(201, SportSchema)
-    def post(self, sport_data):
-        db = get_db()
-        cursor = db.cursor(cursor_factory=RealDictCursor)
+    @SQLHelper.handle_database_connection
+    def post(self, cursor, sport_data):
+
         cursor.execute(
             "INSERT INTO sport (name, slug, active) VALUES (%s, %s, %s) RETURNING name, slug, active;",
             (sport_data["name"], sport_data["slug"], sport_data["active"]),
         )
-
         item = cursor.fetchone()
-        db.commit()
-        cursor.close()
 
         return jsonify(item)

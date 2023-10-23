@@ -20,8 +20,7 @@ services:
       - DB_PASS=changeme
     depends_on:
       - db
-
-
+    command: ["flask", "run", "--host", "0.0.0.0"]
 
   db:
     image: postgres:13-alpine

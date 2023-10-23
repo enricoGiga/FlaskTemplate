@@ -25,6 +25,7 @@ class SQLHelper:
         if 'db' not in g:
             g.db = SQLHelper.get_connection_pool().getconn()
         return g.db
+
     @staticmethod
     def handle_database_connection(func):
         @wraps(func)
@@ -52,7 +53,5 @@ class SQLHelper:
             finally:
                 if cursor:
                     cursor.close()
-                if connection:
-                    SQLHelper.get_connection_pool().putconn(connection)
 
         return wrapper
