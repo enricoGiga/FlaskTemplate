@@ -51,4 +51,6 @@ if __name__ == '__main__':
     print(f'Total internal nodes in the tree: {find_internal_nodes_num(my_tree)}')
     print(f'But we don\'t need any BFS in this case, see the next line: ')
     internal_nodes = len(set(my_tree)) - 1
-    print(f'time complexity solution (O(N)): {internal_nodes}')
+    print(f'Total internal nodes in the tree: {internal_nodes}')
+    print('time complexity solution (O(N))')
+
