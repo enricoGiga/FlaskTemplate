@@ -1,10 +1,10 @@
 from flask import jsonify, current_app
 from flask.views import MethodView
-from flask_smorest import Blueprint, abort
-from psycopg2.extras import RealDictCursor
+from flask_smorest import Blueprint
 
 from schemas import SportSchema, SportUpdateSchema
-from utility.database import SQLHelper
+from extensions.database import handle_database_connection
+
 from utility.exceptions import create_exceptions
 
 sportBlueprint = Blueprint("Sports", "sports", description="Operations on sports")
@@ -13,7 +13,7 @@ sportBlueprint = Blueprint("Sports", "sports", description="Operations on sports
 @sportBlueprint.route("/sport/<string:sport_id>")
 class Sport(MethodView):
     @sportBlueprint.response(200, SportSchema)
-    @SQLHelper.handle_database_connection
+    @handle_database_connection
     def get(self, cursor, sport_id):
         cache = current_app.config["CACHE"]
         cached_sport = cache.get(sport_id)
@@ -29,7 +29,7 @@ class Sport(MethodView):
         cache.set(sport_id, sport, timeout=60)
         return jsonify(sport)
 
-    @SQLHelper.handle_database_connection
+    @handle_database_connection
     def delete(self, cursor, sport_id):
 
         cursor.execute('SELECT * FROM sport WHERE name = %s', (sport_id,))
@@ -41,7 +41,7 @@ class Sport(MethodView):
 
         return {"message": "Sport deleted."}
 
-    @SQLHelper.handle_database_connection
+    @handle_database_connection
     @sportBlueprint.arguments(SportUpdateSchema)
     @sportBlueprint.response(200, SportSchema)
     def put(self, cursor, sport_data, sport_id):
@@ -70,7 +70,7 @@ class Sport(MethodView):
 
 @sportBlueprint.route("/sport")
 class SportList(MethodView):
-    @SQLHelper.handle_database_connection
+    @handle_database_connection
     @sportBlueprint.response(200, SportSchema(many=True))
     def get(self, cursor):
         cursor.execute('SELECT name, slug, active FROM sport')
@@ -81,7 +81,7 @@ class SportList(MethodView):
     @create_exceptions
     @sportBlueprint.arguments(SportSchema)
     @sportBlueprint.response(201, SportSchema)
-    @SQLHelper.handle_database_connection
+    @handle_database_connection
     def post(self, cursor, sport_data):
 
         cursor.execute(

@@ -3,15 +3,14 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 
 from schemas import EventSchema
-from utility.database import SQLHelper
-from utility.exceptions import create_exceptions
+from extensions.database import handle_database_connection
 
 eventBlueprint = Blueprint("Events", "events", description="Operations on events")
 
 
 @eventBlueprint.route("/event")
 class EventList(MethodView):
-    @SQLHelper.handle_database_connection
+    @handle_database_connection
     @eventBlueprint.arguments(EventSchema)
     @eventBlueprint.response(201, EventSchema)
     def post(self, cursor, event_data):

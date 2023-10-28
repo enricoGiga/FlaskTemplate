@@ -1,13 +1,13 @@
 from flask import request, jsonify
 from flask_smorest import Blueprint
 
-from utility.database import SQLHelper
+from extensions.database import handle_database_connection
 
 searchBlueprint = Blueprint("Search", "search", description="Operations on search")
 
 
 @searchBlueprint.route('/search/event_start_with', methods=['GET'])
-@SQLHelper.handle_database_connection
+@handle_database_connection
 def get_event_start_with(cursor):
     """
     Get events starting with a specific string.
@@ -24,7 +24,7 @@ def get_event_start_with(cursor):
 
 
 @searchBlueprint.route('/search/events_active_selections_count', methods=['GET'])
-@SQLHelper.handle_database_connection
+@handle_database_connection
 def get_events_active_selections_count(cursor):
     """
     Get events with a minimum number of active selections greater than or equal to the provided threshold.
@@ -49,7 +49,7 @@ def get_events_active_selections_count(cursor):
 
 
 @searchBlueprint.route('/search/events_scheduled_in_timeframe', methods=['GET'])
-@SQLHelper.handle_database_connection
+@handle_database_connection
 def get_events_scheduled_in_timeframe(cursor):
     """
     Get events scheduled to start in a specific timeframe for a specific timezone.
@@ -69,7 +69,7 @@ def get_events_scheduled_in_timeframe(cursor):
 
 
 @searchBlueprint.route('/search', methods=['GET'])
-@SQLHelper.handle_database_connection
+@handle_database_connection
 def get(cursor):
     filters = request.args.to_dict()
     results = []

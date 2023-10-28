@@ -1,6 +1,8 @@
 import unittest
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+
+from flask import g
 
 from app import create_app
 from schemas import EventSchema
@@ -11,10 +13,9 @@ class TestEvent(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client()
 
-    @patch('utility.database.SQLHelper.get_connection_pool')
-    def test_post(self, mock_get_connection_pool):
-        mock_connection = mock_get_connection_pool.return_value.getconn.return_value
-        mock_cursor = mock_connection.cursor.return_value
+    @patch('app.db_pool')
+    def test_post(self, db_pool):
+        mock_cursor = db_pool.getconn.return_value.cursor.return_value
 
         time = datetime.now()
         utc_time = time.astimezone(timezone.utc)
@@ -32,7 +33,7 @@ class TestEvent(unittest.TestCase):
         loaded_data = EventSchema().load(expected_data)
         # serialization
         serialized_data = EventSchema().dump(loaded_data)
-        mock_cursor.fetchone.return_value = serialized_data
+        mock_cursor.fetchone = Mock(return_value=serialized_data)
 
         data = {
             "name": "Test Event",
@@ -50,6 +51,7 @@ class TestEvent(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         response_data = response.get_json()
         self.assertEqual(response_data, expected_data)
+
 
 
 if __name__ == '__main__':

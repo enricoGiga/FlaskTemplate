@@ -4,7 +4,8 @@ from flask_smorest import Blueprint
 from marshmallow import ValidationError
 
 from schemas import SelectionSchema, SelectionUpdateSchema
-from utility.database import SQLHelper
+from extensions.database import handle_database_connection
+
 from utility.exceptions import create_exceptions
 
 selectionBlueprint = Blueprint("Selections", "selections", description="Operations on selections")
@@ -23,7 +24,7 @@ def handle_validation_error(error):
 
 @selectionBlueprint.route("/selection")
 class SelectionList(MethodView):
-    @SQLHelper.handle_database_connection
+    @handle_database_connection
     @create_exceptions
     @selectionBlueprint.arguments(SelectionSchema)
     @selectionBlueprint.response(201, SelectionSchema)
@@ -40,10 +41,22 @@ class SelectionList(MethodView):
 
         return jsonify(selection)
 
-    @SQLHelper.handle_database_connection
+    @handle_database_connection
     @selectionBlueprint.arguments(SelectionUpdateSchema)
     def put(self, cursor, sport_data):
+        """Description of your endpoint.
 
+          This is a longer description of your endpoint.
+          ---
+          parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                type: integer
+                format: int64
+              description: The ID of the item to update.
+          """
         name = request.args.get('name')
         event = request.args.get('event')
 
@@ -78,8 +91,6 @@ class SelectionList(MethodView):
                 if counter_results["inactive_count"] == counter_results["total_count"]:
                     update_query = 'UPDATE event SET active = %s WHERE name = %s'
                     cursor.execute(update_query, (False, event))
-
-
 
         if outcome is not None:
             update_query = 'UPDATE selection SET outcome = %s WHERE name = %s AND event = %s '

@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from datetime import timezone
 
@@ -5,51 +6,48 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, g
 from flask_caching import Cache
 from flask_smorest import Api
-from psycopg2.extras import RealDictCursor
+from psycopg2 import pool
 
-from utility.database import SQLHelper
+from extensions.database import handle_database_connection
 
-# Initialize the scheduler
 scheduler = BackgroundScheduler()
 
-@SQLHelper.handle_database_connection
-def get_events(cursor):
-    current_time = datetime.now()
-    # Convert the local time to UTC
-    utc_time = current_time.astimezone(timezone.utc)
-    query = """
-    SELECT * FROM event
-    WHERE scheduled_start <= %s AND status = 'Pending'
-    """
-    cursor.execute(query, (utc_time,))
-    events = cursor.fetchall()
-
-    return events
-
-@SQLHelper.handle_database_connection
-def update_event_status(event_id, cursor):
-
-    current_time = datetime.now()
-    # Convert the local time to UTC
-    utc_time = current_time.astimezone(timezone.utc)
-
-    update_query = """
-        UPDATE event SET status = %s, actual_start = %s WHERE name = %s
-    """
-    cursor.execute(update_query, ("Started", utc_time, event_id))
-
-
-def check_event_statuses():
+db_pool = pool.SimpleConnectionPool(
+    1,  # minimum number of connections
+    10,  # maximum number of connections
+    dbname=os.environ.get("DB_NAME"),
+    user=os.environ.get("DB_USER"),
+    password=os.environ.get("DB_PASS"),
+    host=os.environ.get("DB_HOST"),
+    port=5432,
+)
+@handle_database_connection
+def check_event_statuses(cursor):
     with app.app_context():
-
-        events = get_events()  # Implement a function to fetch all events from the database
+        current_time = datetime.now()
+        # Convert the local time to UTC
+        utc_time = current_time.astimezone(timezone.utc)
+        query = """
+        SELECT * FROM event
+        WHERE scheduled_start <= %s AND status = 'Pending'
+        """
+        cursor.execute(query, (utc_time,))
+        events = cursor.fetchall()  # Implement a function to fetch all events from the database
         for event in events:
-            update_event_status( event['name'])
+            current_time = datetime.now()
+            # Convert the local time to UTC
+            utc_time = current_time.astimezone(timezone.utc)
 
+            update_query = """
+                UPDATE event SET status = %s, actual_start = %s WHERE name = %s
+            """
+            cursor.execute(update_query, ("Started", utc_time, event["name"]))
 
 
 def create_app():
     app = Flask(__name__)
+
+
     app.config["API_TITLE"] = "Stores REST API"
     app.config["API_VERSION"] = "v1"
     app.config["OPENAPI_VERSION"] = "3.0.3"
@@ -63,19 +61,23 @@ def create_app():
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["CACHE_TYPE"] = "SimpleCache"
     app.config["CACHE_DEFAULT_TIMEOUT"] = 300
+
+    # scheduler.add_job(check_event_statuses, 'interval', seconds=5)
+    # scheduler.start()
     # Adding Flask-Caching configurations
     cache = Cache(app)
     cache.init_app(app)
     app.config["CACHE"] = cache  # Store the cache object in the app context
 
-    # Create a function to close the database connection and return it to the pool
-    @app.teardown_appcontext
-    def close_db(error):
-        if 'db' in g:
-            g.db.commit()
-            # Make sure any pending transactions are committed
-            SQLHelper.get_connection_pool().putconn(g.db)
-            g.pop('db', None)
+    @app.before_request
+    def before_request():
+        g.db = db_pool.getconn()
+
+    @app.teardown_request
+    def teardown_request(exception):
+        db = g.pop('db', None)
+        if db is not None:
+            db_pool.putconn(db)
 
     api = Api(app)
     from resources.event import eventBlueprint
@@ -92,7 +94,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    # Schedule the job to run periodically, for example every minute
-    scheduler.add_job(check_event_statuses, 'interval', seconds=15)
-    scheduler.start()
     app.run(host="0.0.0.0", port=5000)
