@@ -1,4 +1,4 @@
-# 888Spectate api Project with Docker
+# Docker Flask application template
 
 ## Introduction
 
