@@ -17,7 +17,7 @@ jobs:
       - name: Set up Docker Compose
         run: docker-compose up -d
       - name: Test
-        run: docker-compose exec app sh -c "python manage.py test"
+        run: docker-compose run app sh -c "python manage.py test"
       - name: Show logs
         run: docker-compose logs
 
