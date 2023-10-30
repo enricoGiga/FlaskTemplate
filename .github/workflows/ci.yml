@@ -24,7 +24,7 @@ jobs:
         run: docker-compose run app sh -c "python manage.py test"
       - name: Show logs
         run: docker-compose logs
-
+#
 #      - name: Lint
 #        run: docker-compose run --rm app sh -c "flake8"
 #
