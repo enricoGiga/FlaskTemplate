@@ -2,10 +2,9 @@ from flask import jsonify, current_app
 from flask.views import MethodView
 from flask_smorest import Blueprint
 
-from schemas import SportSchema, SportUpdateSchema
-from extensions.database import handle_database_connection
-
-from utility.exceptions import create_exceptions
+from server.schemas import SportSchema, SportUpdateSchema
+from server.extensions.database import handle_database_connection
+from server.utility.exceptions import create_exceptions
 
 sportBlueprint = Blueprint("Sports", "sports", description="Operations on sports")
 

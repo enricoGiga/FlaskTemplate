@@ -2,10 +2,8 @@ import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch, Mock
 
-from flask import g
-
 from app import create_app
-from schemas import EventSchema
+from server.schemas import EventSchema
 
 
 class TestEvent(unittest.TestCase):
@@ -22,7 +20,7 @@ class TestEvent(unittest.TestCase):
         now = utc_time.strftime('%Y-%m-%d %H:%M:%S')
         expected_data = {
             "name": "Test Event",
-            "slug": "test-event",
+            "slug": "tests-event",
             "active": True,
             "type": "type",
             "sport": "sport",
@@ -37,7 +35,7 @@ class TestEvent(unittest.TestCase):
 
         data = {
             "name": "Test Event",
-            "slug": "test-event",
+            "slug": "tests-event",
             "active": True,
             "type": "type",
             "sport": "sport",

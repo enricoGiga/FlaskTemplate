@@ -2,8 +2,8 @@ from flask import jsonify
 from flask.views import MethodView
 from flask_smorest import Blueprint
 
-from schemas import EventSchema
-from extensions.database import handle_database_connection
+from server.extensions.database import handle_database_connection
+from server.schemas import EventSchema
 
 eventBlueprint = Blueprint("Events", "events", description="Operations on events")
 
@@ -19,6 +19,7 @@ class EventList(MethodView):
                 VALUES (%s, %s, %s, %s, %s, %s, %s) 
                 RETURNING name, slug, active, type, sport, status, scheduled_start;
                 """
+
         args = (event_data["name"], event_data["slug"], event_data["active"], event_data["type"],
                 event_data["sport"], event_data["status"], event_data["scheduled_start"])
         cursor.execute(query, args)

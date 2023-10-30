@@ -2,8 +2,8 @@ version: "3.9"
 
 services:
   app:
-    image: 888_api:latest
-    container_name: 888_api
+    image: flask_api:latest
+    container_name: flask_api_container
     build:
       context: .
       args:
@@ -12,7 +12,7 @@ services:
       - "5000:5000"
 #    by using volumes we sync our local code with our container, so we don't need to rebuild every time our container
     volumes:
-      - ./app:/app
+      - ./server:/server
     environment:
       - DB_HOST=db
       - DB_NAME=devdb

@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from flask_smorest import Blueprint
 
-from extensions.database import handle_database_connection
+from server.extensions.database import handle_database_connection
 
 searchBlueprint = Blueprint("Search", "search", description="Operations on search")
 
@@ -12,7 +12,7 @@ def get_event_start_with(cursor):
     """
     Get events starting with a specific string.
     """
-
+    print("ciao")
     start_with = request.args.get("start_with")
     query = """
             SELECT * FROM event

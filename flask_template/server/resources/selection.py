@@ -3,10 +3,9 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 from marshmallow import ValidationError
 
-from schemas import SelectionSchema, SelectionUpdateSchema
-from extensions.database import handle_database_connection
-
-from utility.exceptions import create_exceptions
+from server.schemas import SelectionSchema, SelectionUpdateSchema
+from server.extensions.database import handle_database_connection
+from server.utility.exceptions import create_exceptions
 
 selectionBlueprint = Blueprint("Selections", "selections", description="Operations on selections")
 
