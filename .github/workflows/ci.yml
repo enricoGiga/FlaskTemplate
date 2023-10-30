@@ -6,7 +6,6 @@ on:
       - master
     types:
       - opened
-
 jobs:
   test-lint:
     name: Test and Lint
