@@ -20,8 +20,10 @@ class EventList(MethodView):
                 RETURNING name, slug, active, type, sport, status, scheduled_start;
                 """
 
-        args = (event_data["name"], event_data["slug"], event_data["active"], event_data["type"],
-                event_data["sport"], event_data["status"], event_data["scheduled_start"])
+        args = (
+            event_data["name"], event_data["slug"], event_data["active"],
+            event_data["type"],
+            event_data["sport"], event_data["status"], event_data["scheduled_start"])
         cursor.execute(query, args)
         event = cursor.fetchone()
 

@@ -1,20 +1,19 @@
 # manage.py
 
 
+import subprocess
+import sys
 import unittest
-
-# import coverage
 
 from flask.cli import FlaskGroup
 
-
-import subprocess
-import sys
-
 from app import create_app
+
+# import coverage
 
 app = create_app()
 cli = FlaskGroup(create_app=create_app)
+
 
 # code coverage
 # COV = coverage.coverage(

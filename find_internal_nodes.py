@@ -1,5 +1,6 @@
 from collections import deque
 
+
 class TreeNode:
     def __init__(self, val):
         self.val = val
@@ -53,4 +54,3 @@ if __name__ == '__main__':
     internal_nodes = len(set(my_tree)) - 1
     print(f'Total internal nodes in the tree: {internal_nodes}')
     print('time complexity solution (O(N))')
-

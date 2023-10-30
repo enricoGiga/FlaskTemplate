@@ -20,13 +20,12 @@ class TestSearchBlueprint(unittest.TestCase):
 
         mock_start_with = 'Mocked'
 
-        response = self.client.get('/search/event_start_with', query_string={'start_with': mock_start_with})
+        response = self.client.get('/search/event_start_with',
+                                   query_string={'start_with': mock_start_with})
         data = response.get_json()
 
         mock_cursor.execute.assert_called_once()
         self.assertEqual(data, expected_data)
-
-    
 
 
 if __name__ == '__main__':

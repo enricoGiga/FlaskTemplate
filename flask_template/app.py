@@ -1,14 +1,12 @@
 import os
-from datetime import datetime
-from datetime import timezone
 
-from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, g
 from flask_caching import Cache
 from flask_smorest import Api
 from psycopg2 import pool
 
-scheduler = BackgroundScheduler()
+# scheduler = BackgroundScheduler()
 
 db_pool = pool.SimpleConnectionPool(
     1,  # minimum number of connections
@@ -94,4 +92,3 @@ def create_app():
 if __name__ == "__main__":
     app = create_app()
     app.run(host="0.0.0.0", port=5000, debug=True)
-

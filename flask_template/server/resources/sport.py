@@ -2,8 +2,8 @@ from flask import jsonify, current_app
 from flask.views import MethodView
 from flask_smorest import Blueprint
 
-from server.schemas import SportSchema, SportUpdateSchema
 from server.extensions.database import handle_database_connection
+from server.schemas import SportSchema, SportUpdateSchema
 from server.utility.exceptions import create_exceptions
 
 sportBlueprint = Blueprint("Sports", "sports", description="Operations on sports")
@@ -82,7 +82,6 @@ class SportList(MethodView):
     @sportBlueprint.response(201, SportSchema)
     @handle_database_connection
     def post(self, cursor, sport_data):
-
         cursor.execute(
             "INSERT INTO sport (name, slug, active) VALUES (%s, %s, %s) RETURNING name, slug, active;",
             (sport_data["name"], sport_data["slug"], sport_data["active"]),
