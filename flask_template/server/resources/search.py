@@ -12,7 +12,7 @@ def get_event_start_with(cursor):
     """
     Get events starting with a specific string.
     """
-    print("ciao")
+
     start_with = request.args.get("start_with")
     query = """
             SELECT * FROM event
