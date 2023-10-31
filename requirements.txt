@@ -1,5 +1,4 @@
 flask==2.3.3
-flake8==3.7.9
 psycopg2
 flask-smorest==0.42.1
 python-dotenv

@@ -37,3 +37,21 @@ It includes a basic Flask application with a Swagger UI endpoint.
 If you encounter any issues during the installation or execution of the project, please
 ensure that your Docker setup is correct and that there are no conflicts with existing
 services on your machine.
+
+
+
+## Some useful commands:
+- Access to your docker container with:
+```shell
+docker container exec flask_api_container sh -c "<your linux command here>" 
+docker-compose exec app sh -c "<your linux command here>"
+  ```
+- Run flake8:
+```shell
+docker-compose run  app sh -c "flake8"   
+```
+- Run the unit tests:
+```shell
+docker-compose run app sh -c "pytest tests/**" 
+docker-compose run app sh -c "python manage.py test"
+```
