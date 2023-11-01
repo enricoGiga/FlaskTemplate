@@ -28,7 +28,7 @@ jobs:
 
       - name: Lint
         run: | 
-          docker-compose exec -T app sh -c "flake8 --ignore=E501,E231 *.py"
+          docker-compose exec -T app sh -c "flake8 --ignore=E501,E231 *.py && pylint --disable=C0301 --disable=C0326 *.py"
         continue-on-error: true
 
       - name: Show logs
