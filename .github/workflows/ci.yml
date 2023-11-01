@@ -24,11 +24,11 @@ jobs:
         run: docker-compose up -d
 
       - name: Test
-        run: docker-compose exec app sh -c "python manage.py test"
+        run: docker-compose exec -T app sh -c "python manage.py test"
 
       - name: Lint
         run: | 
-          docker-compose exec --rm app sh -c "flake8 --ignore=E501,E231 *.py"
+          docker-compose exec -T app sh -c "flake8 --ignore=E501,E231 *.py"
         continue-on-error: true
 
       - name: Show logs
