@@ -50,40 +50,42 @@ def create_app():
     """
     Create the Flask app and configure it.
     """
-    app = Flask(__name__)
+    flask_app = Flask(__name__)
 
-    app.config["API_TITLE"] = "Stores REST API"
-    app.config["API_VERSION"] = "v1"
-    app.config["OPENAPI_VERSION"] = "3.0.3"
-    app.config["OPENAPI_URL_PREFIX"] = "/"
-    app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
+    flask_app.config["API_TITLE"] = "Stores REST API"
+    flask_app.config["API_VERSION"] = "v1"
+    flask_app.config["OPENAPI_VERSION"] = "3.0.3"
+    flask_app.config["OPENAPI_URL_PREFIX"] = "/"
+    flask_app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
 
-    app.config[
+    flask_app.config[
         "OPENAPI_SWAGGER_UI_URL"
     ] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
-    app.config["PROPAGATE_EXCEPTIONS"] = True
-    app.config["CACHE_TYPE"] = "SimpleCache"
-    app.config["CACHE_DEFAULT_TIMEOUT"] = 300
+    flask_app.config["PROPAGATE_EXCEPTIONS"] = True
+    flask_app.config["CACHE_TYPE"] = "SimpleCache"
+    flask_app.config["CACHE_DEFAULT_TIMEOUT"] = 300
 
     # scheduler.add_job(check_event_statuses, 'interval', seconds=5)
     # scheduler.start()
     # Adding Flask-Caching configurations
-    cache = Cache(app)
-    cache.init_app(app)
-    app.config["CACHE"] = cache  # Store the cache object in the server context
+    cache = Cache(flask_app)
+    cache.init_app(flask_app)
+    flask_app.config["CACHE"] = cache  # Store the cache object in the server context
 
-    @app.before_request
+    @flask_app.before_request
     def before_request():
         g.db = db_pool.getconn()
 
-    @app.teardown_request
+    @flask_app.teardown_request
     def teardown_request(exception):
         db = g.pop('db', None)
         if db is not None:
             db_pool.putconn(db)
+        if exception:
+            print(f"An exception occurred: {exception}")
 
-    api = Api(app)
+    api = Api(flask_app)
     from server.resources.event import eventBlueprint
     from server.resources.search import searchBlueprint
     from server.resources.selection import selectionBlueprint
@@ -93,7 +95,7 @@ def create_app():
     api.register_blueprint(selectionBlueprint)
     api.register_blueprint(searchBlueprint)
 
-    return app
+    return flask_app
 
 
 if __name__ == "__main__":
