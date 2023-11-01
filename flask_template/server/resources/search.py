@@ -68,36 +68,3 @@ def get_events_scheduled_in_timeframe(cursor):
     return jsonify(results)
 
 
-@searchBlueprint.route('/search', methods=['GET'])
-@handle_database_connection
-def get(cursor):
-    filters = request.args.to_dict()
-    results = []
-    # Construct the query based on the provided filters
-    query = """
-            SELECT distinct e.slug, e.scheduled_start, e.status, se.outcome \
-            FROM sport s \
-            LEFT JOIN event e ON s.name = e.sport \
-            LEFT JOIN selection se ON e.name = se.event \
-            WHERE  1=1 \
-        """
-    args = []
-    for key, value in filters.items():
-        if key.startswith("event_"):
-            column = "e." + key.replace("event_", "")
-            query += f"AND {column}=%s "
-            args.append((value,))
-
-        elif key.startswith("sport_"):
-            column = "s." + key.replace("sport_", "")
-            query += f"AND {column}=%s "
-            args.append((value,))
-
-        elif key.startswith("selection_"):
-            column = "se." + key.replace("selection_", "")
-            query += f"AND {column}=%s "
-            args.append((value,))
-    cursor.execute(query, args)
-    results = cursor.fetchall()
-
-    return jsonify(results)

@@ -26,6 +26,9 @@ jobs:
       - name: Test
         run: docker-compose exec -T app sh -c "python manage.py test"
 
+      - name: Coverage
+        run: docker-compose exec -T app sh -c "pytest --cov=server tests/*"
+
       - name: Lint
         run: | 
           docker-compose exec -T app sh -c "flake8 --ignore=E501,E231 *.py && pylint --disable=C0301 --disable=C0415 *.py"

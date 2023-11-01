@@ -2,3 +2,4 @@ flake8==3.7.9
 pytest==7.4.3
 pytest-cov
 pylint
+coverage
