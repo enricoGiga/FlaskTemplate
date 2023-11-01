@@ -1,4 +1,6 @@
-# manage.py
+"""
+Utility manager for common commands
+"""
 
 
 import subprocess
@@ -28,30 +30,6 @@ cli = FlaskGroup(create_app=create_app)
 # COV.start()
 
 
-# @cli.command()
-# def create_db():
-#     db.drop_all()
-#     db.create_all()
-#     db.session.commit()
-#
-
-# @cli.command()
-# def drop_db():
-#     """Drops the db tables."""
-#     db.drop_all()
-
-#
-# @cli.command()
-# def create_admin():
-#     """Creates the admin user."""
-#     db.session.add(User(email="ad@min.com", password="admin", admin=True))
-#     db.session.commit()
-
-
-@cli.command()
-def create_data():
-    """Creates sample data."""
-    pass
 
 
 @cli.command()
@@ -85,7 +63,7 @@ def test():
 @cli.command()
 def flake():
     """Runs flake8 on the project."""
-    subprocess.run(["flake8", "server"])
+    subprocess.run(["flake8", "server"], shell=True, check=False)
 
 
 if __name__ == "__main__":

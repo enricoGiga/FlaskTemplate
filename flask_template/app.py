@@ -1,3 +1,7 @@
+"""
+App module for the REST API.
+"""
+
 import os
 
 # from apscheduler.schedulers.background import BackgroundScheduler
@@ -43,6 +47,9 @@ db_pool = pool.SimpleConnectionPool(
 
 
 def create_app():
+    """
+    Create the Flask app and configure it.
+    """
     app = Flask(__name__)
 
     app.config["API_TITLE"] = "Stores REST API"
