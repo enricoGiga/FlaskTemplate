@@ -1,2 +1,3 @@
 flake8==3.7.9
-pytest
+pytest==7.4.3
+pytest-cov

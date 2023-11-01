@@ -75,11 +75,11 @@ def get(cursor):
     results = []
     # Construct the query based on the provided filters
     query = """
-            SELECT distinct e.slug, e.scheduled_start, e.status, se.outcome
-            FROM sport s
-            LEFT JOIN event e ON s.name = e.sport
-            LEFT JOIN selection se ON e.name = se.event
-            WHERE  1=1 
+            SELECT distinct e.slug, e.scheduled_start, e.status, se.outcome \
+            FROM sport s \
+            LEFT JOIN event e ON s.name = e.sport \
+            LEFT JOIN selection se ON e.name = se.event \
+            WHERE  1=1 \
         """
     args = []
     for key, value in filters.items():

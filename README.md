@@ -55,3 +55,15 @@ docker-compose run  app sh -c "flake8"
 docker-compose run app sh -c "pytest tests/**" 
 docker-compose run app sh -c "python manage.py test"
 ```
+
+
+## Deploying a CI/CD pipeline
+- Linting (Enforce coding standards, improve code quality, catch errors early in the design cycle)
+- Unit tests ( Checks code at the component level, exploses problems closer to the code, unit tests must be
+ fast running)
+
+# Continuous Delivery and Deployment.
+- In this part of the development cycle, the integrated code is compiled into artifact and stored.
+ To further improve the quality of the product, the artifacts can be used for additional testing before
+they're made available for deployment. And in a full continuous deployment cycle, artifacts are deployed
+to live environments which could be used for further testing or even production use.
