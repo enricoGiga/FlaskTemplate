@@ -58,9 +58,14 @@ docker-compose run app sh -c "python manage.py test"
 
 
 ## Deploying a CI/CD pipeline
-- Linting (Enforce coding standards, improve code quality, catch errors early in the design cycle)
-- Unit tests ( Checks code at the component level, exploses problems closer to the code, unit tests must be
+The following are the steps to the CI pipeline
+1) Set up the Docker compose
+2) Unit tests ( Checks code at the component level, exposes problems closer to the code, unit tests must be
  fast running)
+3) Coverage, the configuration of the pytest-cov library is [here](flask_template%2F.coveragerc).
+    We set a minimum level of coverage of 70%
+4) Linting (Enforce coding standards, improve code quality, catch errors early in the design cycle)
+
 
 # Continuous Delivery and Deployment.
 - In this part of the development cycle, the integrated code is compiled into artifact and stored.
