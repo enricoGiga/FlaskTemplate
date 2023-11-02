@@ -14,14 +14,15 @@ class EventList(MethodView):
     @eventBlueprint.arguments(EventSchema)
     @eventBlueprint.response(201, EventSchema)
     def post(self, cursor, event_data):
-        query = """
-                INSERT INTO event (name, slug, active, type, sport, status, scheduled_start) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s) 
-                RETURNING name, slug, active, type, sport, status, scheduled_start;
-                """
+        query = """ \
+        INSERT INTO event (name, slug, active, type, sport, status, scheduled_start) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s) \
+        RETURNING name, slug, active, type, sport, status, scheduled_start;"""
 
-        args = (event_data["name"], event_data["slug"], event_data["active"], event_data["type"],
-                event_data["sport"], event_data["status"], event_data["scheduled_start"])
+        args = (
+            event_data["name"], event_data["slug"], event_data["active"],
+            event_data["type"],
+            event_data["sport"], event_data["status"], event_data["scheduled_start"])
         cursor.execute(query, args)
         event = cursor.fetchone()
 

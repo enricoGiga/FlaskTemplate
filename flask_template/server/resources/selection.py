@@ -3,11 +3,12 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 from marshmallow import ValidationError
 
-from server.schemas import SelectionSchema, SelectionUpdateSchema
 from server.extensions.database import handle_database_connection
+from server.schemas import SelectionSchema, SelectionUpdateSchema
 from server.utility.exceptions import create_exceptions
 
-selectionBlueprint = Blueprint("Selections", "selections", description="Operations on selections")
+selectionBlueprint = Blueprint("Selections", "selections",
+                               description="Operations on selections")
 
 
 @selectionBlueprint.errorhandler(ValidationError)
@@ -33,7 +34,8 @@ class SelectionList(MethodView):
             "INSERT INTO selection (name, event, price, active, outcome) "
             "VALUES (%s, %s, %s, %s, %s) "
             "RETURNING name, event, price, active, outcome;",
-            (selection_data["name"], selection_data["event"], selection_data["price"], selection_data["active"],
+            (selection_data["name"], selection_data["event"], selection_data["price"],
+             selection_data["active"],
              selection_data["outcome"]),
         )
         selection = cursor.fetchone()
@@ -59,7 +61,8 @@ class SelectionList(MethodView):
         name = request.args.get('name')
         event = request.args.get('event')
 
-        cursor.execute('SELECT * FROM selection WHERE name = %s AND event = %s', (name, event))
+        cursor.execute('SELECT * FROM selection WHERE name = %s AND event = %s',
+                       (name, event))
         selection = cursor.fetchone()
 
         if not selection:
@@ -95,7 +98,8 @@ class SelectionList(MethodView):
             update_query = 'UPDATE selection SET outcome = %s WHERE name = %s AND event = %s '
             cursor.execute(update_query, (outcome, name, event))
 
-        cursor.execute('SELECT * FROM selection WHERE name = %s AND event = %s', (name, event))
+        cursor.execute('SELECT * FROM selection WHERE name = %s AND event = %s',
+                       (name, event))
         selection_updated = cursor.fetchone()
 
         return jsonify(selection_updated)

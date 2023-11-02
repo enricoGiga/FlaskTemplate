@@ -51,6 +51,5 @@ class TestEvent(unittest.TestCase):
         self.assertEqual(response_data, expected_data)
 
 
-
 if __name__ == '__main__':
     unittest.main()

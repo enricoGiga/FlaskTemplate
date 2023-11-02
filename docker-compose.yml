@@ -10,9 +10,10 @@ services:
         - DEV=true
     ports:
       - "5000:5000"
-#    by using volumes we sync our local code with our container, so we don't need to rebuild every time our container
+    #    by using volumes we sync our local code with our container, so we don't need to rebuild every time our container
     volumes:
-      - ./server:/server
+#      - ./server:/server
+      - ./flask_template:/app
     environment:
       - DB_HOST=db
       - DB_NAME=devdb
@@ -22,11 +23,12 @@ services:
       db:
         condition: service_healthy
 
-    command: ["flask", "run", "--host", "0.0.0.0"]
+    command: [ "flask", "run", "--host", "0.0.0.0" ]
 
   db:
     image: postgres:13-alpine
     container_name: db-postgres
+    user: postgres
     ports:
       - "5433:5432"
     volumes:
@@ -35,7 +37,6 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-q", "-d", "devdb", "-U", "devuser" ]
       interval: 5s
-      timeout: 5s
       retries: 5
     environment:
       - POSTGRES_DB=devdb

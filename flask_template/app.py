@@ -1,14 +1,16 @@
-import os
-from datetime import datetime
-from datetime import timezone
+"""
+App module for the REST API.
+"""
 
-from apscheduler.schedulers.background import BackgroundScheduler
+import os
+
+# from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, g
 from flask_caching import Cache
 from flask_smorest import Api
 from psycopg2 import pool
 
-scheduler = BackgroundScheduler()
+# scheduler = BackgroundScheduler()
 
 db_pool = pool.SimpleConnectionPool(
     1,  # minimum number of connections
@@ -45,40 +47,45 @@ db_pool = pool.SimpleConnectionPool(
 
 
 def create_app():
-    app = Flask(__name__)
+    """
+    Create the Flask app and configure it.
+    """
+    flask_app = Flask(__name__)
 
-    app.config["API_TITLE"] = "Stores REST API"
-    app.config["API_VERSION"] = "v1"
-    app.config["OPENAPI_VERSION"] = "3.0.3"
-    app.config["OPENAPI_URL_PREFIX"] = "/"
-    app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
+    flask_app.config["API_TITLE"] = "Stores REST API"
+    flask_app.config["API_VERSION"] = "v1"
+    flask_app.config["OPENAPI_VERSION"] = "3.0.3"
+    flask_app.config["OPENAPI_URL_PREFIX"] = "/"
+    flask_app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
 
-    app.config[
+    flask_app.config[
         "OPENAPI_SWAGGER_UI_URL"
     ] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
-    app.config["PROPAGATE_EXCEPTIONS"] = True
-    app.config["CACHE_TYPE"] = "SimpleCache"
-    app.config["CACHE_DEFAULT_TIMEOUT"] = 300
+    flask_app.config["PROPAGATE_EXCEPTIONS"] = True
+    flask_app.config["CACHE_TYPE"] = "SimpleCache"
+    flask_app.config["CACHE_DEFAULT_TIMEOUT"] = 300
 
     # scheduler.add_job(check_event_statuses, 'interval', seconds=5)
     # scheduler.start()
     # Adding Flask-Caching configurations
-    cache = Cache(app)
-    cache.init_app(app)
-    app.config["CACHE"] = cache  # Store the cache object in the server context
+    cache = Cache(flask_app)
+    cache.init_app(flask_app)
+    flask_app.config["CACHE"] = cache  # Store the cache object in the server context
 
-    @app.before_request
+    @flask_app.before_request
     def before_request():
         g.db = db_pool.getconn()
 
-    @app.teardown_request
+    @flask_app.teardown_request
     def teardown_request(exception):
         db = g.pop('db', None)
         if db is not None:
             db_pool.putconn(db)
+        if exception:
+            print(f"An exception occurred: {exception}")
 
-    api = Api(app)
+    api = Api(flask_app)
     from server.resources.event import eventBlueprint
     from server.resources.search import searchBlueprint
     from server.resources.selection import selectionBlueprint
@@ -88,10 +95,9 @@ def create_app():
     api.register_blueprint(selectionBlueprint)
     api.register_blueprint(searchBlueprint)
 
-    return app
+    return flask_app
 
 
 if __name__ == "__main__":
     app = create_app()
     app.run(host="0.0.0.0", port=5000, debug=True)
-

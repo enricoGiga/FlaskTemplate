@@ -1,2 +1,5 @@
-flake8>=3.9.2,<3.10
-pytest
+flake8==3.7.9
+pytest==7.4.3
+pytest-cov
+pylint
+coverage

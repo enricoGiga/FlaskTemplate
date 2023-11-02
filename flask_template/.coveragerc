@@ -1,0 +1,16 @@
+[run]
+source =
+    app.py
+    server/
+
+omit =
+    */__init__.py
+    */tests/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+
+precision = 2
+
+fail_under = 70

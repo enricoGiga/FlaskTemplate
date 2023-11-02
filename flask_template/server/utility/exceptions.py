@@ -14,5 +14,3 @@ def create_exceptions(func):
             abort(http_status_code=409, message=e.pgerror)
 
     return wrapper
-
-
