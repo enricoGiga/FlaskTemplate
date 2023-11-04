@@ -1,5 +1,6 @@
 name: Continuous integration pipeline
-on: [ push ]
+on:
+  workflow_call:
 #on:
 #  pull_request:
 #    branches:
