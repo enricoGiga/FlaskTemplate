@@ -13,12 +13,6 @@ jobs:
     permissions:
       checks: write
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -44,7 +38,8 @@ jobs:
       - name: Coverage
         run: docker-compose exec -T app sh -c "pytest --cov=server tests/*"
 
-
+      - name: Publish Coverage Report
+        run: docker-compose exec -T app sh -c "coverage xml"
 
       - name: Show logs
         run: docker-compose logs
