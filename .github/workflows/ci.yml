@@ -1,6 +1,5 @@
 name: Continuous integration pipeline
-on:
-  workflow_call:
+on: [push]
 
 
 permissions:
