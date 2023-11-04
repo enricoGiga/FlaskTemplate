@@ -104,7 +104,7 @@ The above image shows the steps of the CI pipeline defined [here](.github%2Fwork
 ### Login to docker hub
 This step is used to log in to Docker Hub using the docker/login-action action. It uses the Docker Hub username and token stored as secrets in the GitHub repository.
 ### Checkout
-This step is used to log in to Docker Hub using the 'docker/login-action' action. It uses the Docker Hub username and token stored as secrets in the GitHub repository.
+The _actions/checkout_ action is used to check out the code from the repository to the runner, allowing subsequent steps in the workflow to access and manipulate the code. 
 ### Coverage
 This step calculates the test coverage using the command docker-compose exec -T app sh -c "pytest --cov=server tests/*". This step fails if the coverage is under 70%, as defined in the configuration file [.coveragerc](flask_template%2F.coveragerc)
 
