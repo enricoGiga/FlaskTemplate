@@ -1,6 +1,9 @@
 name: Continuous integration pipeline
 on:
   workflow_call:
+
+permissions:
+  contents: read
 #on:
 #  pull_request:
 #    branches:
@@ -27,7 +30,7 @@ jobs:
         run: docker-compose up -d
 
       - name: Lint
-        run: | 
+        run: |
           docker-compose exec -T app sh -c "flake8 --ignore=E501,E231 *.py && pylint --disable=C0301 --disable=C0415 *.py"
         continue-on-error: true
 
