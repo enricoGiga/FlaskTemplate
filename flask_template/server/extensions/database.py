@@ -7,6 +7,7 @@ from psycopg2.extras import RealDictCursor
 def handle_database_connection(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        """Wrapper function to handle database connection and cursor creation."""
 
         is_method = False
         if len(args) > 0 and hasattr(args[0], '__class__'):

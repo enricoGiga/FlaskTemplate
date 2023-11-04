@@ -14,7 +14,8 @@ class EventList(MethodView):
     @eventBlueprint.arguments(EventSchema)
     @eventBlueprint.response(201, EventSchema)
     def post(self, cursor, event_data):
-        query = """ \
+        """Create a new event."""
+        query = """\
         INSERT INTO event (name, slug, active, type, sport, status, scheduled_start) \
         VALUES (%s, %s, %s, %s, %s, %s, %s) \
         RETURNING name, slug, active, type, sport, status, scheduled_start;"""

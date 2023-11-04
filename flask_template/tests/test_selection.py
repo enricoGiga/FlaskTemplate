@@ -40,6 +40,10 @@ class TestSelection(unittest.TestCase):
         self.assertEqual(mock_cursor.execute.call_count, 5)
         self.assertEqual(response.get_json(), expected_response)
 
+    # @patch('app.db_pool')
+    # def test_post(self, db_pool):
+    #     mock_cursor = db_pool.getconn.return_value.cursor.return_value
+
 
 if __name__ == '__main__':
     unittest.main()
