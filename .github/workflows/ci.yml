@@ -55,8 +55,8 @@ jobs:
 
       - name: Publish images to docker hub
         run: |
-          docker-compose exec -T app sh -c "docker tag flask_api:latest ${{ secrets.DOCKERHUB_USER }}/flask_api_template:latest"
-          docker-compose exec -T app sh -c "docker push ${{ secrets.DOCKERHUB_USER }}/flask_api_template:latest"
+          docker tag flask_api:latest ${{ secrets.DOCKERHUB_USER }}/flask_api_template:latest
+          docker push ${{ secrets.DOCKERHUB_USER }}/flask_api_template:latest
 
       - name: Stop Docker Compose
         run: docker-compose down
