@@ -61,7 +61,7 @@ jobs:
 
   delivery:
     needs: [ ci-pipeline ]
-    if: github.event.pull_request.merged == true
+#    if: github.event.pull_request.merged == true
     runs-on: ubuntu-20.04
     steps:
       - name: Publish images to docker hub
