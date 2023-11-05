@@ -11,8 +11,7 @@ on:
       - production
     types:
       - opened
-      - edited
-      - reopened
+      - synchronize
 
 
 permissions:
