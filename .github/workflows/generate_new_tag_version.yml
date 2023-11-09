@@ -19,7 +19,7 @@ jobs:
       - name: Get the updated version
         id: get_version
         env:
-          CONFIG_FILE_PATH: setup.cfg
+          SEMVER_LEVEL: major
         uses: enricoGiga/next-semver@v1.1.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
