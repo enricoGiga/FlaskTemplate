@@ -59,22 +59,5 @@ jobs:
       - name: Coverage
         run: docker-compose exec -T app sh -c "pytest --cov=server tests/*"
 
-#  delivery:
-#    needs: [ ci-pipeline ]
-##    if: github.event.pull_request.merged == true
-#    runs-on: ubuntu-20.04
-#    steps:
-#      - name: Publish images to docker hub
-#        run: |
-#          echo "github.ref: ${{ github.ref }}"
-#          echo "github.sha: ${{ github.sha }}"
-#          echo "github.event_name: ${{ github.event_name }}"
-#          echo "github.repository: ${{ github.repository }}"
-#          echo "github.event.pull_request.merged: ${{ github.event.pull_request.merged }}"
-#          echo "github.event.pull_request.head.ref: ${{ github.event.pull_request.head.ref }}"
-#
-#          docker tag flask_api:latest ${{ secrets.DOCKERHUB_USER }}/flask_api_template:latest
-#          docker push ${{ secrets.DOCKERHUB_USER }}/flask_api_template:latest
-#
 
 
