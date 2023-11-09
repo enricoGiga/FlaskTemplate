@@ -18,9 +18,10 @@ jobs:
 #      - run: chmod +x foobar/config.cfg
       - name: Get the updated version
         id: get_version
-        uses: enricoGiga/next-semvar@v1.0.1
+        env:
+          CONFIG_FILE_PATH: setup.cfg
+        uses: enricoGiga/next-semver@v1.0.0
         with:
-          config_file_path: 'setup.cfg'
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get the output time and the input string
