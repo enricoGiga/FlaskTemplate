@@ -1,4 +1,6 @@
+
 on:
+
   pull_request:
     branches:
       - main
@@ -7,6 +9,7 @@ on:
 
 jobs:
   get_next_version_and_create_release:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions: write-all
     name: A job to get the new semantic version number
