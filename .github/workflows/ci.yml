@@ -1,10 +1,7 @@
 name: CI Pipeline
 # set on when pull request is open to master or production branch, and when push to master or production branch but lunch Publish images to docker hub step only when pull request is merged to master or production branch successfully
 on:
-  push:
-    branches:
-      - master
-      - production
+
   pull_request:
     branches:
       - master
