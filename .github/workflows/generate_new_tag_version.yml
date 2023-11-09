@@ -20,7 +20,7 @@ jobs:
         id: get_version
         uses: enricoGiga/next-semvar@v1.0.1
         with:
-          config_file_path: 'config.cfg'
+          config_file_path: 'setup.cfg'
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get the output time and the input string
