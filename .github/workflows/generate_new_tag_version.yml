@@ -20,7 +20,7 @@ jobs:
         id: get_version
         env:
           CONFIG_FILE_PATH: setup.cfg
-        uses: enricoGiga/next-semver@v1.0.0
+        uses: enricoGiga/next-semver@v1.1.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
